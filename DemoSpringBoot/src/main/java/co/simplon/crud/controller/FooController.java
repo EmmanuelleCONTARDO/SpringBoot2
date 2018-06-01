@@ -1,6 +1,5 @@
 package co.simplon.crud.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,79 +30,108 @@ class FooController {
 
 	@Inject
 	FooService fooService;
-	
+
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Foo> getFooById(@PathVariable(value = "id") Long userId) {
 		Optional<Foo> note = fooService.findbyId(userId);
 		return note.isPresent() ? ResponseEntity.ok().body(note.get()) : ResponseEntity.notFound().build();
 	}
-	   
+
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
 	public List<Foo> findAll() {
-		List<Foo> foo = new ArrayList<Foo>();
-		foo.add(new Foo(1L,"toto"));
-		foo.add(new Foo(2L,"titi"));
-		foo.add(new Foo(3L,"tutu"));		
-		return foo;
-	}		
-	
+		// List<Foo> foo = new ArrayList<Foo>();
+		// foo.add(new Foo(1L, "toto"));
+		// foo.add(new Foo(2L, "titi"));
+		// foo.add(new Foo(3L, "tutu"));
+		// return foo;
+		return fooService.getAll();
+	}
+
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
 	public Long create(@RequestBody Foo resource) {
-		System.out.println(resource);
-	    return 1L;
+		return fooService.saveFoo(resource).getId();
+		// System.out.println(resource);
+		// return 1L;
 	}
-	/*
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
 	@ResponseBody
-	public Foo read(@PathVariable("id") Long id) {
-	  return new Foo(id, "fake read");
+	public void update(@PathVariable(value = "id") Long id, @RequestBody Foo resource) {
+		resource.setId(id);		
+		fooService.saveFoo(resource).getId();
 	}
-	*/
+	
+	
+	//Méthode delete
+//	var xmlhttp = new XMLHttpRequest();
+//	xmlhttp.open("DELETE", "/foos/1");
+//	xmlhttp.setRequestHeader("Content-Type", "application/json");
+//	xmlhttp.send(JSON.stringify({}));
+//
+//	xmlhttp.response
+	
+	
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public void deletee(@PathVariable(value = "id") Long id) {
+		fooService.delete(id);
+	}
+	
+	
+	
+
+	/*
+	 * @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	 * 
+	 * @ResponseBody public Foo read(@PathVariable("id") Long id) { return new
+	 * Foo(id, "fake read"); }
+	 */
 	@RequestMapping(value = "/testParam", method = RequestMethod.GET)
 	@ResponseBody
-	//URL de test : http://localhost:8090/foos/testParam?param1=toto&param2=titi
-	public String readParam(@RequestParam(value="param1", required=false) String param1,
-	        				@RequestParam(value="param2", required=false) String param2) {
-		return ("param1 : "+param1+"<br />param2 : "+param2);
+	// URL de test : http://localhost:8090/foos/testParam?param1=toto&param2=titi
+	public String readParam(@RequestParam(value = "param1", required = false) String param1,
+			@RequestParam(value = "param2", required = false) String param2) {
+		return ("param1 : " + param1 + "<br />param2 : " + param2);
 	}
-	
+
 	@RequestMapping(value = "/testParamMap", method = RequestMethod.GET)
 	@ResponseBody
-	//URL de test : http://localhost:8090/foos/testParamMap?param1=value1&param2=value2....
+	// URL de test :
+	// http://localhost:8090/foos/testParamMap?param1=value1&param2=value2....
 	public String readParamMap(@RequestParam Map<String, String> parameters) {
-		String output="";
-		
-		//Methode 1 pour parcourir la Map
+		String output = "";
+
+		// Methode 1 pour parcourir la Map
 		/*
-		for(String key : parameters.keySet()) {
-			parameters.get(key);
-		}
-		*/
-		
-		//Methode 2 pour parcourir la Map
-		for(Entry<String,String> e : parameters.entrySet()) {
+		 * for(String key : parameters.keySet()) { parameters.get(key); }
+		 */
+
+		// Methode 2 pour parcourir la Map
+		for (Entry<String, String> e : parameters.entrySet()) {
 			output += (e.getKey() + " : " + e.getValue() + "<br />");
 		}
-		
+
 		return output;
 	}
-	
+
 	@RequestMapping(value = "/cookie", method = RequestMethod.GET)
 	@ResponseBody
 	public String readCookie(@CookieValue("monCookie") String cookie) {
-		return ("Contenu du Cookie = "+cookie);
+		return ("Contenu du Cookie = " + cookie);
 	}
-	
+
 	@RequestMapping(value = "/createCookie", method = RequestMethod.GET)
 	@ResponseBody
 	public void createCookie(HttpServletResponse response) {
 		Cookie cookie = new Cookie("monCookie", "contenuDuCookie");
-	    cookie.setPath("/");
-	    cookie.setMaxAge(1000);
-	    response.addCookie(cookie);
+		cookie.setPath("/");
+		cookie.setMaxAge(1000);
+		response.addCookie(cookie);
 	}
+
 }
